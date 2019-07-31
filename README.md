@@ -16,7 +16,7 @@ This component will retreieve the following data from your YNAB budget
 #### Manual install
 1. Using the tool of choice open the directory (folder) for your HA configuration (where you find configuration.yaml).
 2. If you do not have a custom_components directory (folder) there, you need to create it.
-3. In the custom_components directory (folder) create a new folder called breaking_changes.
+3. In the custom_components directory (folder) create a new folder called ynab.
 4. Download all the files from the custom_components/ynab/ directory (folder) in this repository.
 5. Place the files you downloaded in the new directory (folder) you created.
 6. Add ynab: to your HA configuration (see examples below)
