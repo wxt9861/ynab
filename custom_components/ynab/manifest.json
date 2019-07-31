@@ -1,0 +1,8 @@
+{
+    "domain": "ynab",
+    "name": "ynab",
+    "documentation": "https://www.github.com/wxt9861",
+    "dependencies": [],
+    "codeowners": ["@wxt9861"],
+    "requirements": ["ynab-sdk==0.0.3"]
+  }
