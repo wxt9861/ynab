@@ -1,20 +1,22 @@
 ## Configuration options
 
-Key | Type | Required | Default | Description
--- | -- | -- | -- | --
-`api_key` | `string` | `True` | None | YNAB API key (see insturctions below)
-`name` | `string` | False | sensor.ynab | Custom name for the sensor
-`budget` | `string` | False | last-used | Budget ID to use if you have multiple budgets. If none specified, your last used budget will be used
-`currency` | `string` | False | $ |Currency to use as unit of measurement
-`categories` | `list` | False | None |List of YNAB categories to include in the sensor. These are <b>CASE SENSATIVE<b>
+| Key          | Type     | Required | Default     | Description                                                                                          |
+| ------------ | -------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------- |
+| `api_key`    | `string` | `True`   | None        | YNAB API key (see insturctions below)                                                                |
+| `name`       | `string` | False    | sensor.ynab | Custom name for the sensor                                                                           |
+| `budget`     | `string` | False    | last-used   | Budget ID to use if you have multiple budgets. If none specified, your last used budget will be used |
+| `currency`   | `string` | False    | \$          | Currency to use as unit of measurement                                                               |
+| `categories` | `list`   | False    | None        | List of YNAB categories to include in the sensor. These are <b>CASE SENSATIVE<b>                     |
 
 ## Example default configuration.yaml
+
 ```yaml
 ynab:
   api_key: <api_key_here>
 ```
 
 ## Example: configuration.yaml with options
+
 ```yaml
 ynab:
   api_key: <api_key_here>
@@ -25,8 +27,11 @@ ynab:
     - "HASS Budget"
     - "Vacation Budget"
 ```
+
 ## Generate YNAB API key / Get budget ID
+
 API:
+
 1. Log on to YNAB
 2. Go to My Budget > My Account > Developer Settings
 3. Click on New Token

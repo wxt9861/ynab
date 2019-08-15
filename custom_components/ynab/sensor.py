@@ -29,19 +29,27 @@ class ynabSensor(Entity):
         """Update the sensor."""
         await self.hass.data[DOMAIN_DATA]["client"].update_data()
 
-        not_budgeted = self.hass.data[DOMAIN_DATA].get("to_be_budgeted")
+        to_be_budgeted = self.hass.data[DOMAIN_DATA].get("to_be_budgeted")
 
-        if not_budgeted is None:
+        if to_be_budgeted is None:
             self._state = self._state
         else:
-            self._state = not_budgeted
+            self._state = to_be_budgeted
 
-        # Set attributes
+        # set attributes
         self.attr["budgeted_this_month"] = self.hass.data[DOMAIN_DATA].get(
             "budgeted_this_month"
         )
 
-        # Category attributes
+        self.attr["uncleared_transactions"] = self.hass.data[DOMAIN_DATA].get(
+            "uncleared_transactions"
+        )
+
+        self.attr["overspent_categories"] = self.hass.data[DOMAIN_DATA].get(
+            "overspent_categories"
+        )
+
+        # category attributes
         if self._categories is not None:
             for category in self._categories:
                 if self.hass.data[DOMAIN_DATA].get(category) is not None:

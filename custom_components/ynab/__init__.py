@@ -38,7 +38,6 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
                 vol.Optional("budget", default=DEFAULT_BUDGET): cv.string,
                 vol.Optional("currency", default=DEFAULT_CURRENCY): cv.string,
-                vol.Optional("scan_interval", default=60): cv.positive_int,
                 vol.Optional("categories", default=None): vol.All(cv.ensure_list),
             }
         )
@@ -72,7 +71,7 @@ async def async_setup(hass, config):
 
     # load platforms
     for platform in PLATFORMS:
-        # Get platform specific configuration
+        # get platform specific configuration
         platform_config = config[DOMAIN]
 
         hass.async_create_task(
@@ -96,11 +95,11 @@ class ynabData:
     async def update_data(self):
         """Update data."""
         try:
-            # Setup YNAB API
+            # setup YNAB API
             self.ynab = YNAB(self.api_key)
             self.get_data = self.ynab.budgets.get_budget(self.budget).data.budget
 
-            # Get to be budgeted data
+            # get to be budgeted data
             self.hass.data[DOMAIN_DATA]["to_be_budgeted"] = (
                 self.get_data.months[0].to_be_budgeted / 1000
             )
@@ -109,7 +108,22 @@ class ynabData:
                 (self.get_data.months[0].to_be_budgeted / 1000),
             )
 
-            # Get current month data
+            # get number of uncleared transactions
+            uncleared_transactions = len(
+                [
+                    t.amount
+                    for t in self.get_data.transactions
+                    if t.cleared == "uncleared"
+                ]
+            )
+            self.hass.data[DOMAIN_DATA][
+                "uncleared_transactions"
+            ] = uncleared_transactions
+            _LOGGER.debug(
+                "Recieved data for: uncleared transactions: %s", uncleared_transactions
+            )
+
+            # get current month data
             for m in self.get_data.months:
                 if m.month != date.today().strftime("%Y-%m-01"):
                     continue
@@ -118,11 +132,23 @@ class ynabData:
                         m.budgeted / 1000
                     )
                     _LOGGER.debug(
-                        "Recieved data for: budgeted this month %s",
+                        "Recieved data for: budgeted this month: %s",
                         self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
                     )
 
-                    # Get remaining category balances
+                    # get number of overspend categories
+                    overspent_categories = len(
+                        [c.balance for c in m.categories if c.balance < 0]
+                    )
+                    self.hass.data[DOMAIN_DATA][
+                        "overspent_categories"
+                    ] = overspent_categories
+                    _LOGGER.debug(
+                        "Recieved data for: overspent categories: %s",
+                        overspent_categories,
+                    )
+
+                    # get remaining category balances
                     for c in m.categories:
                         if c.name not in self.categories:
                             continue
