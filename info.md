@@ -1,4 +1,4 @@
-## Configuration options
+# Configuration options
 
 | Key          | Type     | Required | Default     | Description                                                                                          |
 | ------------ | -------- | -------- | ----------- | ---------------------------------------------------------------------------------------------------- |
@@ -6,7 +6,7 @@
 | `name`       | `string` | False    | sensor.ynab | Custom name for the sensor                                                                           |
 | `budget`     | `string` | False    | last-used   | Budget ID to use if you have multiple budgets. If none specified, your last used budget will be used |
 | `currency`   | `string` | False    | \$          | Currency to use as unit of measurement                                                               |
-| `categories` | `list`   | False    | None        | List of YNAB categories to include in the sensor. These are <b>CASE SENSATIVE<b>                     |
+| `categories` | `list`   | False    | None        | List of YNAB categories to include in the sensor. These are **CASE SENSATIVE**                       |
 
 ## Example default configuration.yaml
 
@@ -40,5 +40,5 @@ API:
 
 Bidget ID:
 
-The budget ID is the combination between the slahses after the URL https://app.youneedabudget.com
+The budget ID is the combination between the slahses after the URL <https://app.youneedabudget.com>
 If you only have one budget, you can leave the budget option at default, if you have multiple budgets pick a budget you want the sensor to report on. At this time data from only 1 budget is retrieved.

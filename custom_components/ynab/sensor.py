@@ -41,6 +41,8 @@ class ynabSensor(Entity):
             "budgeted_this_month"
         )
 
+        self.attr["need_approval"] = self.hass.data[DOMAIN_DATA].get("need_approval")
+
         self.attr["uncleared_transactions"] = self.hass.data[DOMAIN_DATA].get(
             "uncleared_transactions"
         )

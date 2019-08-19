@@ -6,6 +6,9 @@ This component will retreieve the following data from your YNAB budget
 1. To be budgeted amount
 2. Current month's budgeted amount
 3. Current month's remaining balance of any specified category
+4. Number of transactions needing approval
+5. Number of unclearaed transactions
+6. Number of overspent categories
 
 To keep api usage low, the sensor updates every 5 minutes.
 

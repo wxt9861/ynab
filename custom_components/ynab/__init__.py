@@ -108,6 +108,16 @@ class ynabData:
                 (self.get_data.months[0].to_be_budgeted / 1000),
             )
 
+            # get unapproved transactions
+            unapproved_transactions = len(
+                [t.amount for t in self.get_data.transactions if t.approved != True]
+            )
+            self.hass.data[DOMAIN_DATA]["need_approval"] = unapproved_transactions
+            _LOGGER.debug(
+                "Recieved data for: unapproved transactions: %s",
+                unapproved_transactions,
+            )
+
             # get number of uncleared transactions
             uncleared_transactions = len(
                 [
