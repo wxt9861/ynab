@@ -1,3 +1,4 @@
+"""Constants for YNAB."""
 DOMAIN = "ynab"
 DOMAIN_DATA = "{}_data".format(DOMAIN)
 

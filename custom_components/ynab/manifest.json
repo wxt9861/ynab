@@ -4,5 +4,6 @@
     "documentation": "https://github.com/wxt9861/ynab",
     "dependencies": [],
     "codeowners": ["@wxt9861"],
+    "config_flow": true,
     "requirements": ["ynab-sdk==0.0.3"]
   }

@@ -1,0 +1,23 @@
+{
+    "config": {
+        "title": "YNAB",
+        "step": {
+            "user": {
+                "title": "YNAB",
+                "description": "If you need help with the configuration have a look here: https://github.com/wxt9861/ynab/blob/master/README.md",
+                "data": {
+                    "api_key": "Your YNAB API Key",
+                    "budget": "Budget ID (default is last-used budget)",
+                    "currency": "Currency (default is $)",
+                    "categories": "Categories to monitor (seperated by comma, case senstive)"
+                }
+            }
+        },
+        "error": {
+            "communication": "Could not connect to YNAB, check the API Key."
+        },
+        "abort": {
+            "single_instance_allowed": "Only a single configuration of ESXI Stats is allowed."
+        }
+    }
+}
