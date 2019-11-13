@@ -2,7 +2,7 @@
 
 import logging
 import os
-from datetime import timedelta, datetime, date
+from datetime import timedelta, date
 from ynab_sdk import YNAB
 
 import homeassistant.helpers.config_validation as cv
@@ -54,6 +54,10 @@ async def async_setup(hass, config):
     # check all required files
     file_check = await check_files(hass)
     if not file_check:
+        return False
+
+    url_check = await check_url()
+    if not url_check:
         return False
 
     # create data dictionary
@@ -110,7 +114,7 @@ class ynabData:
 
             # get unapproved transactions
             unapproved_transactions = len(
-                [t.amount for t in self.get_data.transactions if t.approved != True]
+                [t.amount for t in self.get_data.transactions if t.approved is not True]
             )
             self.hass.data[DOMAIN_DATA]["need_approval"] = unapproved_transactions
             _LOGGER.debug(
@@ -192,3 +196,19 @@ async def check_files(hass):
         returnvalue = True
 
     return returnvalue
+
+
+async def check_url():
+    """Return bool that indicates YNAB URL is accessible"""
+    import urllib.request
+    url = "https://api.youneedabudget.com/v1"
+
+    try:
+        if urllib.request.urlopen(url).getcode():  # nosec
+            _LOGGER.debug("Connection with YNAB established")
+            result = True
+    except Exception as error:
+        _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
+        result = False
+
+    return result
