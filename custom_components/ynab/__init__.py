@@ -136,12 +136,26 @@ class ynabData:
             _LOGGER.debug(
                 "Recieved data for: uncleared transactions: %s", uncleared_transactions
             )
+            
+            total_balance = 0
+            # get account data
+            for a in self.get_data.accounts:
+                if a.on_budget:
+                  total_balance += a.balance
+                  
+            # get to be budgeted data
+            self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
+            _LOGGER.debug(
+                "Recieved data for: total balance: %s",
+                (total_balance),
+            )
 
             # get current month data
             for m in self.get_data.months:
                 if m.month != date.today().strftime("%Y-%m-01"):
                     continue
                 else:
+                    # budgeted
                     self.hass.data[DOMAIN_DATA]["budgeted_this_month"] = (
                         m.budgeted / 1000
                     )
@@ -149,7 +163,16 @@ class ynabData:
                         "Recieved data for: budgeted this month: %s",
                         self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
                     )
-
+                    
+                    # activity
+                    self.hass.data[DOMAIN_DATA]["activity_this_month"] = (
+                        m.activity / 1000
+                    )
+                    _LOGGER.debug(
+                        "Recieved data for: activity this month: %s",
+                        self.hass.data[DOMAIN_DATA]["activity_this_month"],
+                    )
+                    
                     # get number of overspend categories
                     overspent_categories = len(
                         [c.balance for c in m.categories if c.balance < 0]
