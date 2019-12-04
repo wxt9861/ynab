@@ -147,7 +147,7 @@ class ynabData:
             self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
             _LOGGER.debug(
                 "Recieved data for: total balance: %s",
-                (total_balance),
+                (self.hass.data[DOMAIN_DATA]["total_balance"]),
             )
 
             # get current month data
