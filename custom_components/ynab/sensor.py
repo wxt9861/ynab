@@ -40,6 +40,14 @@ class ynabSensor(Entity):
         self.attr["budgeted_this_month"] = self.hass.data[DOMAIN_DATA].get(
             "budgeted_this_month"
         )
+        
+        self.attr["activity_this_month"] = self.hass.data[DOMAIN_DATA].get(
+            "activity_this_month"
+        )
+        
+        self.attr["total_balance"] = self.hass.data[DOMAIN_DATA].get(
+            "total_balance"
+        )
 
         self.attr["need_approval"] = self.hass.data[DOMAIN_DATA].get("need_approval")
 
