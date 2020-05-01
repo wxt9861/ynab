@@ -4,8 +4,6 @@ import logging
 import os
 from datetime import timedelta, date
 from ynab_sdk import YNAB
-import asyncio
-import aiohttp
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import CONF_API_KEY
@@ -103,9 +101,10 @@ class ynabData:
         try:
             # setup YNAB API
             self.ynab = YNAB(self.api_key)
-            loop = asyncio.get_event_loop()
-            raw_budget = await loop.run_in_executor(None, self.ynab.budgets.get_budget, self.budget)
-            self.get_data = raw_budget.data.budget
+            self.raw_budget = await self.hass.async_add_executor_job(
+                self.ynab.budgets.get_budget, self.budget
+            )
+            self.get_data = self.raw_budget.data.budget
 
             # get to be budgeted data
             self.hass.data[DOMAIN_DATA]["to_be_budgeted"] = (
@@ -140,13 +139,13 @@ class ynabData:
             _LOGGER.debug(
                 "Recieved data for: uncleared transactions: %s", uncleared_transactions
             )
-            
+
             total_balance = 0
             # get account data
             for a in self.get_data.accounts:
                 if a.on_budget:
-                  total_balance += a.balance
-                  
+                    total_balance += a.balance
+
             # get to be budgeted data
             self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
             _LOGGER.debug(
@@ -167,7 +166,7 @@ class ynabData:
                         "Recieved data for: budgeted this month: %s",
                         self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
                     )
-                    
+
                     # activity
                     self.hass.data[DOMAIN_DATA]["activity_this_month"] = (
                         m.activity / 1000
@@ -176,7 +175,7 @@ class ynabData:
                         "Recieved data for: activity this month: %s",
                         self.hass.data[DOMAIN_DATA]["activity_this_month"],
                     )
-                    
+
                     # get number of overspend categories
                     overspent_categories = len(
                         [c.balance for c in m.categories if c.balance < 0]
@@ -227,14 +226,18 @@ async def check_files(hass):
 
 async def check_url():
     """Return bool that indicates YNAB URL is accessible"""
+    import aiohttp
+
     url = "https://api.youneedabudget.com/v1"
+
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                if response.status:  # nosec
+                if response.status:
                     _LOGGER.debug("Connection with YNAB established")
                     result = True
     except Exception as error:
         _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
         result = False
+
     return result
