@@ -232,9 +232,9 @@ async def check_url():
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status:  # nosec
-                    print("Connection with YNAB established")
+                    _LOGGER.debug("Connection with YNAB established")
                     result = True
     except Exception as error:
-        print("Unable to establish connection with YNAB - %s", error)
+        _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
         result = False
     return result
