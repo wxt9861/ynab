@@ -4,6 +4,8 @@ import logging
 import os
 from datetime import timedelta, date
 from ynab_sdk import YNAB
+import asyncio
+import aiohttp
 
 import homeassistant.helpers.config_validation as cv
 from homeassistant.const import CONF_API_KEY
@@ -101,7 +103,9 @@ class ynabData:
         try:
             # setup YNAB API
             self.ynab = YNAB(self.api_key)
-            self.get_data = self.ynab.budgets.get_budget(self.budget).data.budget
+            loop = asyncio.get_event_loop()
+            raw_budget = await loop.run_in_executor(None, self.ynab.budgets.get_budget, self.budget)
+            self.get_data = raw_budget.data.budget
 
             # get to be budgeted data
             self.hass.data[DOMAIN_DATA]["to_be_budgeted"] = (
@@ -223,15 +227,14 @@ async def check_files(hass):
 
 async def check_url():
     """Return bool that indicates YNAB URL is accessible"""
-    import urllib.request
     url = "https://api.youneedabudget.com/v1"
-
     try:
-        if urllib.request.urlopen(url).getcode():  # nosec
-            _LOGGER.debug("Connection with YNAB established")
-            result = True
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status:  # nosec
+                    print("Connection with YNAB established")
+                    result = True
     except Exception as error:
-        _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
+        print("Unable to establish connection with YNAB - %s", error)
         result = False
-
     return result
