@@ -2,7 +2,7 @@
 import logging
 from homeassistant.helpers.entity import Entity
 
-from .const import CATEGORY_ERROR, DOMAIN, DOMAIN_DATA, ICON
+from .const import CATEGORY_ERROR, DOMAIN_DATA, ICON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -10,7 +10,7 @@ _LOGGER = logging.getLogger(__name__)
 async def async_setup_platform(
     hass, config, async_add_entities, discovery_info=None
 ):  # pylint: disable=unused-argument
-    """Setup sensor platform."""
+    """Set up sensor platform."""
     async_add_entities([ynabSensor(hass, discovery_info)], True)
 
 
@@ -18,6 +18,7 @@ class ynabSensor(Entity):
     """YNAB Sensor class."""
 
     def __init__(self, hass, config):
+        """Init."""
         self.hass = hass
         self.attr = {}
         self._state = None
@@ -40,11 +41,11 @@ class ynabSensor(Entity):
         self.attr["budgeted_this_month"] = self.hass.data[DOMAIN_DATA].get(
             "budgeted_this_month"
         )
-        
+
         self.attr["activity_this_month"] = self.hass.data[DOMAIN_DATA].get(
             "activity_this_month"
         )
-        
+
         self.attr["total_balance"] = self.hass.data[DOMAIN_DATA].get(
             "total_balance"
         )
@@ -87,6 +88,7 @@ class ynabSensor(Entity):
 
     @property
     def unit_of_measurement(self):
+        """Return the unit of measurement of the sensor."""
         return self._measurement
 
     @property
