@@ -47,6 +47,7 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass, config):
+    """Set up this integration using yaml."""
     # startup message
     startup = STARTUP.format(name=DOMAIN, version=VERSION, issueurl=ISSUE_URL)
     _LOGGER.info(startup)
@@ -88,6 +89,8 @@ async def async_setup(hass, config):
 
 
 class ynabData:
+    """This class handles communication and data for YNAB integration."""
+
     def __init__(self, hass, config):
         """Initialize the class."""
         self.hass = hass
@@ -225,7 +228,7 @@ async def check_files(hass):
 
 
 async def check_url():
-    """Return bool that indicates YNAB URL is accessible"""
+    """Return bool that indicates YNAB URL is accessible."""
     import aiohttp
 
     url = "https://api.youneedabudget.com/v1"
