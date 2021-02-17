@@ -2,7 +2,9 @@
     "domain": "ynab",
     "name": "ynab",
     "documentation": "https://github.com/wxt9861/ynab",
+    "issue_tracker": "https://github.com/wxt9861/ynab/issues",
     "dependencies": [],
     "codeowners": ["@wxt9861"],
-    "requirements": ["ynab-sdk==0.0.4"]
+    "requirements": ["ynab-sdk==0.2.3"],
+    "version": "0.1.8"
   }

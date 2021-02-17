@@ -32,9 +32,7 @@ class ynabSensor(Entity):
 
         to_be_budgeted = self.hass.data[DOMAIN_DATA].get("to_be_budgeted")
 
-        if to_be_budgeted is None:
-            self._state = self._state
-        else:
+        if to_be_budgeted is not None:
             self._state = to_be_budgeted
 
         # set attributes
