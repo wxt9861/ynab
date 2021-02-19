@@ -9,7 +9,7 @@ Replace API_KEY_HERE with your API key
 Run the file using python3 apitest.py
 
 If everything works, you should see a summary of your budgets
-Otherwise you will see "error"
+Otherwise you will see an error
 """
 
 from ynab_sdk import YNAB
