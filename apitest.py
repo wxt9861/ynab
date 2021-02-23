@@ -17,6 +17,8 @@ from ynab_sdk import YNAB
 try:
     api_key = "API_KEY_HERE"
     apicheck = YNAB(api_key)
-    print(apicheck.budgets.get_budgets())
+    # print(apicheck.budgets.get_budgets())
+    # data = apicheck.budgets.get_budget("BUDGET_ID")
+    # print(data.data.budget.id)
 except Exception:
     raise
