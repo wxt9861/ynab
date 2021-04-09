@@ -66,7 +66,7 @@ async def async_setup(hass, config):
 
     # get global config
     budget = config[DOMAIN].get("budget")
-    _LOGGER.debug("Using budget - %s", budget)
+    _LOGGER.debug("YAML configured budget - %s", budget)
 
     if config[DOMAIN].get("categories") is not None:
         categories = config[DOMAIN].get("categories")
@@ -101,112 +101,110 @@ class ynabData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def update_data(self):
         """Update data."""
-        try:
-            # setup YNAB API
-            self.ynab = YNAB(self.api_key)
-            self.raw_budget = await self.hass.async_add_executor_job(
-                self.ynab.budgets.get_budget, self.budget
-            )
-            self.get_data = self.raw_budget.data.budget
 
-            # get to be budgeted data
-            self.hass.data[DOMAIN_DATA]["to_be_budgeted"] = (
-                self.get_data.months[0].to_be_budgeted / 1000
-            )
-            _LOGGER.debug(
-                "Recieved data for: to be budgeted: %s",
-                (self.get_data.months[0].to_be_budgeted / 1000),
-            )
+        # setup YNAB API
+        self.ynab = YNAB(self.api_key)
+        self.all_budgets = await self.hass.async_add_executor_job(
+            self.ynab.budgets.get_budgets
+        )
+        self.raw_budget = await self.hass.async_add_executor_job(
+            self.ynab.budgets.get_budget, self.budget
+        )
 
-            # get unapproved transactions
-            unapproved_transactions = len(
-                [t.amount for t in self.get_data.transactions if t.approved is not True]
-            )
-            self.hass.data[DOMAIN_DATA]["need_approval"] = unapproved_transactions
-            _LOGGER.debug(
-                "Recieved data for: unapproved transactions: %s",
-                unapproved_transactions,
-            )
+        # get budget summary
+        self.get_all_budgets = self.all_budgets.data.budgets
+        if self.get_all_budgets:
+            _LOGGER.debug("Found %s budgets", len(self.get_all_budgets))
+            for budget in self.get_all_budgets:
+                _LOGGER.debug("Budget name: %s - id: %s", budget.name, budget.id)
+        else:
+            _LOGGER.errors("Unable to retrieve budgets summary")
 
-            # get number of uncleared transactions
-            uncleared_transactions = len(
-                [
-                    t.amount
-                    for t in self.get_data.transactions
-                    if t.cleared == "uncleared"
-                ]
-            )
-            self.hass.data[DOMAIN_DATA][
-                "uncleared_transactions"
-            ] = uncleared_transactions
-            _LOGGER.debug(
-                "Recieved data for: uncleared transactions: %s", uncleared_transactions
-            )
+        self.get_data = self.raw_budget.data.budget
+        _LOGGER.debug("Retrieving data from budget id: %s", self.get_data.id)
 
-            total_balance = 0
-            # get account data
-            for a in self.get_data.accounts:
-                if a.on_budget:
-                    total_balance += a.balance
+        # get to be budgeted data
+        self.hass.data[DOMAIN_DATA]["to_be_budgeted"] = (
+            self.get_data.months[0].to_be_budgeted / 1000
+        )
+        _LOGGER.debug(
+            "Received data for: to be budgeted: %s",
+            (self.get_data.months[0].to_be_budgeted / 1000),
+        )
 
-            # get to be budgeted data
-            self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
-            _LOGGER.debug(
-                "Recieved data for: total balance: %s",
-                (self.hass.data[DOMAIN_DATA]["total_balance"]),
-            )
+        # get unapproved transactions
+        unapproved_transactions = len(
+            [t.amount for t in self.get_data.transactions if t.approved is not True]
+        )
+        self.hass.data[DOMAIN_DATA]["need_approval"] = unapproved_transactions
+        _LOGGER.debug(
+            "Received data for: unapproved transactions: %s",
+            unapproved_transactions,
+        )
 
-            # get current month data
-            for m in self.get_data.months:
-                if m.month != date.today().strftime("%Y-%m-01"):
-                    continue
-                else:
-                    # budgeted
-                    self.hass.data[DOMAIN_DATA]["budgeted_this_month"] = (
-                        m.budgeted / 1000
-                    )
-                    _LOGGER.debug(
-                        "Recieved data for: budgeted this month: %s",
-                        self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
-                    )
+        # get number of uncleared transactions
+        uncleared_transactions = len(
+            [t.amount for t in self.get_data.transactions if t.cleared == "uncleared"]
+        )
+        self.hass.data[DOMAIN_DATA]["uncleared_transactions"] = uncleared_transactions
+        _LOGGER.debug(
+            "Received data for: uncleared transactions: %s", uncleared_transactions
+        )
 
-                    # activity
-                    self.hass.data[DOMAIN_DATA]["activity_this_month"] = (
-                        m.activity / 1000
-                    )
-                    _LOGGER.debug(
-                        "Recieved data for: activity this month: %s",
-                        self.hass.data[DOMAIN_DATA]["activity_this_month"],
-                    )
+        total_balance = 0
+        # get account data
+        for a in self.get_data.accounts:
+            if a.on_budget:
+                total_balance += a.balance
 
-                    # get number of overspend categories
-                    overspent_categories = len(
-                        [c.balance for c in m.categories if c.balance < 0]
-                    )
-                    self.hass.data[DOMAIN_DATA][
-                        "overspent_categories"
-                    ] = overspent_categories
-                    _LOGGER.debug(
-                        "Recieved data for: overspent categories: %s",
-                        overspent_categories,
-                    )
+        # get to be budgeted data
+        self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
+        _LOGGER.debug(
+            "Received data for: total balance: %s",
+            (self.hass.data[DOMAIN_DATA]["total_balance"]),
+        )
 
-                    # get remaining category balances
-                    for c in m.categories:
-                        if c.name not in self.categories:
-                            continue
-                        else:
-                            self.hass.data[DOMAIN_DATA].update(
-                                [(c.name, c.balance / 1000)]
-                            )
-                            _LOGGER.debug(
-                                "Recieved data for categories: %s",
-                                [c.name, c.balance / 1000],
-                            )
+        # get current month data
+        for m in self.get_data.months:
+            if m.month != date.today().strftime("%Y-%m-01"):
+                continue
+            else:
+                # budgeted
+                self.hass.data[DOMAIN_DATA]["budgeted_this_month"] = m.budgeted / 1000
+                _LOGGER.debug(
+                    "Received data for: budgeted this month: %s",
+                    self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
+                )
 
-            # print(self.hass.data[DOMAIN_DATA])
-        except Exception as error:
-            _LOGGER.error("Could not retrieve data - verify API key %s", error)
+                # activity
+                self.hass.data[DOMAIN_DATA]["activity_this_month"] = m.activity / 1000
+                _LOGGER.debug(
+                    "Received data for: activity this month: %s",
+                    self.hass.data[DOMAIN_DATA]["activity_this_month"],
+                )
+
+                # get number of overspend categories
+                overspent_categories = len(
+                    [c.balance for c in m.categories if c.balance < 0]
+                )
+                self.hass.data[DOMAIN_DATA][
+                    "overspent_categories"
+                ] = overspent_categories
+                _LOGGER.debug(
+                    "Received data for: overspent categories: %s",
+                    overspent_categories,
+                )
+
+                # get remaining category balances
+                for c in m.categories:
+                    if c.name not in self.categories:
+                        continue
+                    else:
+                        self.hass.data[DOMAIN_DATA].update([(c.name, c.balance / 1000)])
+                        _LOGGER.debug(
+                            "Received data for categories: %s",
+                            [c.name, c.balance / 1000],
+                        )
 
 
 async def check_files(hass):
@@ -236,9 +234,15 @@ async def check_url():
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
-                if response.status:
+                if response.status == 200:
                     _LOGGER.debug("Connection with YNAB established")
                     result = True
+                else:
+                    _LOGGER.debug(
+                        "Connection with YNAB established, "
+                        "but wasnt able to communicate with API endpoint"
+                    )
+                    result = False
     except Exception as error:
         _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
         result = False

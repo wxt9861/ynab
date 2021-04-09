@@ -4,7 +4,7 @@ DOMAIN_DATA = "{}_data".format(DOMAIN)
 
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = ["const.py", "manifest.json", "sensor.py"]
-VERSION = "0.1.8"
+VERSION = "0.1.9"
 ISSUE_URL = "https://github.com/wxt9861/ynab/issues"
 
 STARTUP = """
