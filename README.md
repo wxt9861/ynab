@@ -80,6 +80,6 @@ API:
 4. Enter your password and click Generate
 5. Copy the token that appears at the top of the page
 
-Bidget ID:  
+Budget ID:  
 The budget ID is the combination between the slahses after the URL <https://app.youneedabudget.com>
 If you only have one budget, you can leave the budget option at default, if you have multiple budgets pick a budget you want the sensor to report on. At this time data from only 1 budget is retrieved.
