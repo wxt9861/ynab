@@ -265,4 +265,3 @@ async def check_url():
         result = False
 
     return result
-    
