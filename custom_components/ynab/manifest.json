@@ -6,5 +6,5 @@
     "dependencies": [],
     "codeowners": ["@wxt9861"],
     "requirements": ["ynab-sdk==0.2.4"],
-    "version": "0.1.9"
+    "version": "0.1.10"
   }
