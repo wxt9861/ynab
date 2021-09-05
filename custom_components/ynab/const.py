@@ -19,6 +19,8 @@ If you have any issues with this you need to open an issue here:
 
 CATEGORY_ERROR = """Unable to create attribute for category \
 '{category}'. Make sure it exists in YNAB and the case is correct"""
+ACCOUNT_ERROR = """Unable to create attribute for account \
+'{account}'. Make sure it exists in YNAB and the case is correct"""
 
 DEFAULT_NAME = "ynab"
 DEFAULT_BUDGET = "last-used"

@@ -2,7 +2,7 @@
 import logging
 from homeassistant.helpers.entity import Entity
 
-from .const import CATEGORY_ERROR, DOMAIN_DATA, ICON
+from .const import ACCOUNT_ERROR, CATEGORY_ERROR, DOMAIN_DATA, ICON
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class ynabSensor(Entity):
         self._name = config["name"]
         self._measurement = config["currency"]
         self._categories = config["categories"]
+        self._accounts = config["accounts"]
 
     async def async_update(self):
         """Update the sensor."""
@@ -68,6 +69,16 @@ class ynabSensor(Entity):
                 else:
                     category_error = CATEGORY_ERROR.format(category=category)
                     _LOGGER.error(category_error)
+
+        if self._accounts is not None:
+            for account in self._accounts:
+                if self.hass.data[DOMAIN_DATA].get(account) is not None:
+                    self.attr[account.replace(" ", "_").lower()] = self.hass.data[
+                        DOMAIN_DATA
+                    ].get(account)
+                else:
+                    account_error = ACCOUNT_ERROR.format(account=account)
+                    _LOGGER.error(account_error)
 
     @property
     def should_poll(self):

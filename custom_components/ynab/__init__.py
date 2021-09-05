@@ -39,6 +39,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Optional("budget", default=DEFAULT_BUDGET): cv.string,
                 vol.Optional("currency", default=DEFAULT_CURRENCY): cv.string,
                 vol.Optional("categories", default=None): vol.All(cv.ensure_list),
+                vol.Optional("accounts", default=None): vol.All(cv.ensure_list),
             }
         )
     },
@@ -72,6 +73,10 @@ async def async_setup(hass, config):
         categories = config[DOMAIN].get("categories")
         _LOGGER.debug("Monitoring categories - %s", categories)
 
+    if config[DOMAIN].get("accounts") is not None:
+        accounts = config[DOMAIN].get("accounts")
+        _LOGGER.debug("Monitoring accounts - %s", accounts)
+
     hass.data[DOMAIN_DATA]["client"] = ynabData(hass, config)
 
     # load platforms
@@ -97,6 +102,7 @@ class ynabData:
         self.api_key = config[DOMAIN].get(CONF_API_KEY)
         self.budget = config[DOMAIN].get("budget")
         self.categories = config[DOMAIN].get("categories")
+        self.accounts = config[DOMAIN].get("accounts")
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def update_data(self):
@@ -163,6 +169,17 @@ class ynabData:
             "Received data for: total balance: %s",
             (self.hass.data[DOMAIN_DATA]["total_balance"]),
         )
+
+        # get accounts
+        for account in self.get_data.accounts:
+            if account.name not in self.accounts:
+                continue
+            else:
+                self.hass.data[DOMAIN_DATA].update([(account.name, account.balance / 1000)])
+                _LOGGER.debug(
+                    "Received data for account: %s",
+                    [account.name, account.balance / 1000],
+                )
 
         # get current month data
         for m in self.get_data.months:
@@ -248,3 +265,4 @@ async def check_url():
         result = False
 
     return result
+    
