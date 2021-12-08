@@ -44,13 +44,9 @@ class ynabSensor(Entity):
         self.attr["activity_this_month"] = self.hass.data[DOMAIN_DATA].get(
             "activity_this_month"
         )
-        self.attr["age_of_money"] = self.hass.data[DOMAIN_DATA].get(
-            "age_of_money"
-        )
+        self.attr["age_of_money"] = self.hass.data[DOMAIN_DATA].get("age_of_money")
 
-        self.attr["total_balance"] = self.hass.data[DOMAIN_DATA].get(
-            "total_balance"
-        )
+        self.attr["total_balance"] = self.hass.data[DOMAIN_DATA].get("total_balance")
 
         self.attr["need_approval"] = self.hass.data[DOMAIN_DATA].get("need_approval")
 
@@ -109,6 +105,6 @@ class ynabSensor(Entity):
         return ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self.attr
