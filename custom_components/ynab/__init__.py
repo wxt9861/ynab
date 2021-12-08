@@ -183,6 +183,13 @@ class ynabData:
                     self.hass.data[DOMAIN_DATA]["activity_this_month"],
                 )
 
+                # get age of money
+                self.hass.data[DOMAIN_DATA]["age_of_money"] = m.age_of_money
+                _LOGGER.debug(
+                    "Received data for: age of money: %s",
+                    self.hass.data[DOMAIN_DATA]["age_of_money"],
+                )
+
                 # get number of overspend categories
                 overspent_categories = len(
                     [c.balance for c in m.categories if c.balance < 0]
