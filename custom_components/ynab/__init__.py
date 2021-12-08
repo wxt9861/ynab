@@ -175,7 +175,9 @@ class ynabData:
             if account.name not in self.accounts:
                 continue
             else:
-                self.hass.data[DOMAIN_DATA].update([(account.name, account.balance / 1000)])
+                self.hass.data[DOMAIN_DATA].update(
+                    [(account.name, account.balance / 1000)]
+                )
                 _LOGGER.debug(
                     "Received data for account: %s",
                     [account.name, account.balance / 1000],
