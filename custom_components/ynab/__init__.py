@@ -104,6 +104,12 @@ class ynabData:
         self.categories = config[DOMAIN].get("categories")
         self.accounts = config[DOMAIN].get("accounts")
 
+        self.ynab = None
+        self.all_budgets = None
+        self.get_all_budgets = None
+        self.raw_budget = None
+        self.get_data = None
+
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def update_data(self):
         """Update data."""
@@ -235,10 +241,10 @@ class ynabData:
 
 async def check_files(hass):
     """Return bool that indicates if all files are present."""
-    base = "{}/custom_components/{}/".format(hass.config.path(), DOMAIN)
+    base = f"{hass.config.path()}/custom_components/{DOMAIN}/"
     missing = []
     for file in REQUIRED_FILES:
-        fullpath = "{}{}".format(base, file)
+        fullpath = f"{base}{file}"
         if not os.path.exists(fullpath):
             missing.append(file)
 

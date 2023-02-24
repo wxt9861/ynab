@@ -1,10 +1,10 @@
 """Constants for YNAB integration."""
 DOMAIN = "ynab"
-DOMAIN_DATA = "{}_data".format(DOMAIN)
+DOMAIN_DATA = f"{DOMAIN}_data"
 
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = ["const.py", "manifest.json", "sensor.py"]
-VERSION = "0.1.10"
+VERSION = "0.1.12"
 ISSUE_URL = "https://github.com/wxt9861/ynab/issues"
 
 STARTUP = """
