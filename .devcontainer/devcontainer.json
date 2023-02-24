@@ -1,6 +1,6 @@
 // See https://aka.ms/vscode-remote/devcontainer.json for format details.
 {
-	"name": "ESXI Stats dev",
+	"name": "ynab dev",
 	"context": "..",
 	"dockerFile": "Dockerfile",
 	"appPort": "8124:8123",
