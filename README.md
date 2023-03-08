@@ -86,4 +86,4 @@ API:
 
 Budget ID:
 The budget ID is the combination between the slashes after the URL <https://app.youneedabudget.com>
-If you only have one budget, you can omit the the budget option, if you have multiple budgets pick a budget you want the sensor to report on. At this time only 1 budget is retrieved.
+If you only have one budget, you can omit the budget option, if you have multiple budgets pick a budget you want the sensor to report on. At this time only 1 budget is retrieved.
