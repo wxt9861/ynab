@@ -77,7 +77,7 @@ async def async_setup(hass, config):
         accounts = config[DOMAIN].get("accounts")
         _LOGGER.debug("Monitoring accounts - %s", accounts)
 
-    hass.data[DOMAIN_DATA]["client"] = ynabData(hass, config)
+    hass.data[DOMAIN_DATA]["client"] = YnabData(hass, config)
 
     # load platforms
     for platform in PLATFORMS:
@@ -93,7 +93,7 @@ async def async_setup(hass, config):
     return True
 
 
-class ynabData:
+class YnabData:
     """This class handles communication and data for YNAB integration."""
 
     def __init__(self, hass, config):
@@ -146,7 +146,11 @@ class ynabData:
 
         # get unapproved transactions
         unapproved_transactions = len(
-            [t.amount for t in self.get_data.transactions if t.approved is not True]
+            [
+                transaction.amount
+                for transaction in self.get_data.transactions
+                if transaction.approved is not True
+            ]
         )
         self.hass.data[DOMAIN_DATA]["need_approval"] = unapproved_transactions
         _LOGGER.debug(
@@ -156,7 +160,11 @@ class ynabData:
 
         # get number of uncleared transactions
         uncleared_transactions = len(
-            [t.amount for t in self.get_data.transactions if t.cleared == "uncleared"]
+            [
+                transaction.amount
+                for transaction in self.get_data.transactions
+                if transaction.cleared == "uncleared"
+            ]
         )
         self.hass.data[DOMAIN_DATA]["uncleared_transactions"] = uncleared_transactions
         _LOGGER.debug(
@@ -165,9 +173,9 @@ class ynabData:
 
         total_balance = 0
         # get account data
-        for a in self.get_data.accounts:
-            if a.on_budget:
-                total_balance += a.balance
+        for account in self.get_data.accounts:
+            if account.on_budget:
+                total_balance += account.balance
 
         # get to be budgeted data
         self.hass.data[DOMAIN_DATA]["total_balance"] = total_balance / 1000
@@ -180,63 +188,65 @@ class ynabData:
         for account in self.get_data.accounts:
             if account.name not in self.accounts:
                 continue
-            else:
-                self.hass.data[DOMAIN_DATA].update(
-                    [(account.name, account.balance / 1000)]
-                )
-                _LOGGER.debug(
-                    "Received data for account: %s",
-                    [account.name, account.balance / 1000],
-                )
+
+            self.hass.data[DOMAIN_DATA].update([(account.name, account.balance / 1000)])
+            _LOGGER.debug(
+                "Received data for account: %s",
+                [account.name, account.balance / 1000],
+            )
 
         # get current month data
-        for m in self.get_data.months:
-            if m.month != date.today().strftime("%Y-%m-01"):
+        for month in self.get_data.months:
+            if month.month != date.today().strftime("%Y-%m-01"):
                 continue
-            else:
-                # budgeted
-                self.hass.data[DOMAIN_DATA]["budgeted_this_month"] = m.budgeted / 1000
-                _LOGGER.debug(
-                    "Received data for: budgeted this month: %s",
-                    self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
-                )
 
-                # activity
-                self.hass.data[DOMAIN_DATA]["activity_this_month"] = m.activity / 1000
-                _LOGGER.debug(
-                    "Received data for: activity this month: %s",
-                    self.hass.data[DOMAIN_DATA]["activity_this_month"],
-                )
+            # budgeted
+            self.hass.data[DOMAIN_DATA]["budgeted_this_month"] = month.budgeted / 1000
+            _LOGGER.debug(
+                "Received data for: budgeted this month: %s",
+                self.hass.data[DOMAIN_DATA]["budgeted_this_month"],
+            )
 
-                # get age of money
-                self.hass.data[DOMAIN_DATA]["age_of_money"] = m.age_of_money
-                _LOGGER.debug(
-                    "Received data for: age of money: %s",
-                    self.hass.data[DOMAIN_DATA]["age_of_money"],
-                )
+            # activity
+            self.hass.data[DOMAIN_DATA]["activity_this_month"] = month.activity / 1000
+            _LOGGER.debug(
+                "Received data for: activity this month: %s",
+                self.hass.data[DOMAIN_DATA]["activity_this_month"],
+            )
 
-                # get number of overspend categories
-                overspent_categories = len(
-                    [c.balance for c in m.categories if c.balance < 0]
-                )
-                self.hass.data[DOMAIN_DATA][
-                    "overspent_categories"
-                ] = overspent_categories
-                _LOGGER.debug(
-                    "Received data for: overspent categories: %s",
-                    overspent_categories,
-                )
+            # get age of money
+            self.hass.data[DOMAIN_DATA]["age_of_money"] = month.age_of_money
+            _LOGGER.debug(
+                "Received data for: age of money: %s",
+                self.hass.data[DOMAIN_DATA]["age_of_money"],
+            )
 
-                # get remaining category balances
-                for c in m.categories:
-                    if c.name not in self.categories:
-                        continue
-                    else:
-                        self.hass.data[DOMAIN_DATA].update([(c.name, c.balance / 1000)])
-                        _LOGGER.debug(
-                            "Received data for categories: %s",
-                            [c.name, c.balance / 1000],
-                        )
+            # get number of overspend categories
+            overspent_categories = len(
+                [
+                    category.balance
+                    for category in month.categories
+                    if category.balance < 0
+                ]
+            )
+            self.hass.data[DOMAIN_DATA]["overspent_categories"] = overspent_categories
+            _LOGGER.debug(
+                "Received data for: overspent categories: %s",
+                overspent_categories,
+            )
+
+            # get remaining category balances
+            for category in month.categories:
+                if category.name not in self.categories:
+                    continue
+
+                self.hass.data[DOMAIN_DATA].update(
+                    [(category.name, category.balance / 1000)]
+                )
+                _LOGGER.debug(
+                    "Received data for categories: %s",
+                    [category.name, category.balance / 1000],
+                )
 
 
 async def check_files(hass):
@@ -259,7 +269,7 @@ async def check_files(hass):
 
 async def check_url():
     """Return bool that indicates YNAB URL is accessible."""
-    import aiohttp
+    import aiohttp  # pylint: disable=import-outside-toplevel
 
     url = "https://api.youneedabudget.com/v1"
 
@@ -275,7 +285,7 @@ async def check_url():
                         "but wasnt able to communicate with API endpoint"
                     )
                     result = False
-    except Exception as error:
+    except Exception as error:  # pylint: disable=broad-except
         _LOGGER.debug("Unable to establish connection with YNAB - %s", error)
         result = False
 
