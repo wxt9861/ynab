@@ -65,6 +65,9 @@ class ynabSensor(Entity):
                     self.attr[category.replace(" ", "_").lower()] = self.hass.data[
                         DOMAIN_DATA
                     ].get(category)
+                    self.attr[
+                        (category + "_budgeted").replace(" ", "_").lower()
+                    ] = self.hass.data[DOMAIN_DATA].get(category + "_budgeted")
                 else:
                     category_error = CATEGORY_ERROR.format(category=category)
                     _LOGGER.error(category_error)
