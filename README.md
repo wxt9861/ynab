@@ -12,7 +12,8 @@ This component will retreieve the following data from your YNAB budget
 7. Number of uncleared transactions
 8. Number of overspent categories
 
-To keep api usage low, the sensor updates every 5 minutes.
+## Update Frequency & YNAB API Rate Limit
+To keep api usage low, the sensor updates every 5 minutes which equates to 12 times per hour.  YNAB has a rate limit (<https://api.ynab.com/#rate-limiting>) of 200 requests per hour and that number resets every hour _on the hour_.
 
 ## Installation
 
