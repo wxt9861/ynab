@@ -274,7 +274,7 @@ async def check_url():
     """Return bool that indicates YNAB URL is accessible."""
     import aiohttp  # pylint: disable=import-outside-toplevel
 
-    url = "https://api.youneedabudget.com/v1"
+    url = "https://api.ynab.com/v1"
 
     try:
         async with aiohttp.ClientSession() as session:
