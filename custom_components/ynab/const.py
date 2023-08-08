@@ -25,6 +25,7 @@ ACCOUNT_ERROR = """Unable to create attribute for account \
 DEFAULT_NAME = "ynab"
 DEFAULT_BUDGET = "last-used"
 DEFAULT_CURRENCY = "$"
+DEFAULT_API_ENDPOINT = "https://api.ynab.com/v1"
 
 ICON = "mdi:finance"
 
