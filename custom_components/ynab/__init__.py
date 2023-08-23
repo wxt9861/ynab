@@ -277,6 +277,16 @@ class YnabData:
                             len(response_data["data"]["transaction_ids"]),
                         )
                         _LOGGER.debug("API Stats: %s", response.headers["X-Rate-Limit"])
+
+                        if len(response_data["data"]["transaction_ids"]) > 0:
+                            _event_topic = DOMAIN + "_event"
+                            _event_data = {
+                                "transactions_imported": len(
+                                    response_data["data"]["transaction_ids"]
+                                )
+                            }
+                            self.hass.bus.async_fire(_event_topic, _event_data)
+
         except Exception as error:  # pylint: disable=broad-except
             _LOGGER.debug("Error encounted during forced import - %s", error)
 
