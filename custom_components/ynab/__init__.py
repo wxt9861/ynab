@@ -1,22 +1,24 @@
 """YNAB Integration."""
 
+import json
 import logging
 import os
-from datetime import timedelta, date
-from ynab_sdk import YNAB
+from datetime import date, timedelta
 
+import aiohttp
 import homeassistant.helpers.config_validation as cv
+import voluptuous as vol
 from homeassistant.const import CONF_API_KEY
 from homeassistant.helpers import discovery
 from homeassistant.util import Throttle
-
-import voluptuous as vol
+from ynab_sdk import YNAB
 
 from .const import (
     CONF_NAME,
-    DEFAULT_NAME,
+    DEFAULT_API_ENDPOINT,
     DEFAULT_BUDGET,
     DEFAULT_CURRENCY,
+    DEFAULT_NAME,
     DOMAIN,
     DOMAIN_DATA,
     ISSUE_URL,
@@ -115,6 +117,8 @@ class YnabData:
         """Update data."""
 
         # setup YNAB API
+        await self.request_import()
+
         self.ynab = YNAB(self.api_key)
         self.all_budgets = await self.hass.async_add_executor_job(
             self.ynab.budgets.get_budgets
@@ -251,6 +255,41 @@ class YnabData:
                     [category.name, category.balance / 1000, category.budgeted / 1000],
                 )
 
+    async def request_import(self):
+        """Force transaction import."""
+
+        import_endpoint = (
+            f"{DEFAULT_API_ENDPOINT}/budgets/{self.budget}/transactions/import"
+        )
+        headers = {
+            "accept": "application/json",
+            "Authorization": f"Bearer {self.api_key}",
+        }
+
+        try:
+            async with aiohttp.ClientSession(headers=headers) as session:
+                async with session.post(url=import_endpoint) as response:
+                    if response.status in [200, 201]:
+                        response_data = json.loads(await response.text())
+
+                        _LOGGER.debug(
+                            "Imported transactions: %s",
+                            len(response_data["data"]["transaction_ids"]),
+                        )
+                        _LOGGER.debug("API Stats: %s", response.headers["X-Rate-Limit"])
+
+                        if len(response_data["data"]["transaction_ids"]) > 0:
+                            _event_topic = DOMAIN + "_event"
+                            _event_data = {
+                                "transactions_imported": len(
+                                    response_data["data"]["transaction_ids"]
+                                )
+                            }
+                            self.hass.bus.async_fire(_event_topic, _event_data)
+
+        except Exception as error:  # pylint: disable=broad-except
+            _LOGGER.debug("Error encounted during forced import - %s", error)
+
 
 async def check_files(hass):
     """Return bool that indicates if all files are present."""
@@ -272,9 +311,8 @@ async def check_files(hass):
 
 async def check_url():
     """Return bool that indicates YNAB URL is accessible."""
-    import aiohttp  # pylint: disable=import-outside-toplevel
 
-    url = "https://api.youneedabudget.com/v1"
+    url = DEFAULT_API_ENDPOINT
 
     try:
         async with aiohttp.ClientSession() as session:
