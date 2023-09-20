@@ -45,28 +45,6 @@ To keep api usage low, the sensor updates every 5 minutes.
 | `categories` | `list`   | False    | None        | List of YNAB categories to include in the sensor. These are **CASE SENSITIVE**                       |
 | `accounts` | `list`   | False    | None          | List of YNAB accounts to include in the sensor. These are **CASE SENSITIVE**                       |
 
-### Example default configuration.yaml
-
-```yaml
-ynab:
-  api_key: <api_key_here>
-```
-
-### Example: configuration.yaml with options
-
-```yaml
-ynab:
-  api_key: <api_key_here>
-  name: "My YNAB Budget"
-  budget: <budget_id_here>
-  currency: "$"
-  categories:
-    - "HASS Budget"
-    - "Vacation Budget"
-  accounts:
-    - "Savings Account"
-```
-
 ### To enable debug
 
 ```yaml
@@ -75,7 +53,7 @@ logger:
     custom_components.ynab: debug
 ```
 
-### Generate YNAB API key / Get budget ID
+### Generate YNAB API key
 
 API:
 
@@ -85,6 +63,14 @@ API:
 4. Enter your password and click Generate
 5. Copy the token that appears at the top of the page
 
-Budget ID:
-The budget ID is the combination between the slashes after the URL <https://app.youneedabudget.com>
-If you only have one budget, you can omit the budget option, if you have multiple budgets pick a budget you want the sensor to report on. At this time only 1 budget is retrieved.
+### Setup the integration
+
+1. Navigate to Settings -> Devices & Services on your Home Assistant instance
+2. Select "Add Integration" in the bottom right hand corner
+3. Search for and select "ynab" from the list
+4. Enter your API key from the previous step into the "API Key" field and click submit
+5. Your API key will be validated and your budgets retrieved.  Select the budget you want to use from the list
+6. Select one or more categories to sync then click "Submit", or if you don't want to sync any categories just click "Submit"
+7. Select one or more accounts to sync then click "Submit", or if you don't want to sync any accounts just click "Submit"
+
+The budget is now setup and will start updating automatically.  You can go through the same process to add multiple budgets all of which will be kept updated.

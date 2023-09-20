@@ -2,16 +2,16 @@
 import logging
 from homeassistant.helpers.entity import Entity
 
-from .const import ACCOUNT_ERROR, CATEGORY_ERROR, DOMAIN_DATA, ICON
+from .const import ACCOUNT_ERROR, CATEGORY_ERROR, DOMAIN_DATA, ICON, CONF_ACCOUNTS_KEY, CONF_BUDGET_KEY, CONF_CATEGORIES_KEY, CONF_CURRENCY_KEY, CONF_BUDGET_NAME_KEY
 
 _LOGGER = logging.getLogger(__name__)
 
 
-async def async_setup_platform(
-    hass, config, async_add_entities, discovery_info=None
-):  # pylint: disable=unused-argument
+async def async_setup_entry(
+    hass, config_entry, async_add_entities
+):
     """Set up sensor platform."""
-    async_add_entities([ynabSensor(hass, discovery_info)], True)
+    async_add_entities([ynabSensor(hass, config_entry.data)], True)
 
 
 class ynabSensor(Entity):
@@ -22,10 +22,11 @@ class ynabSensor(Entity):
         self.hass = hass
         self.attr = {}
         self._state = None
-        self._name = config["name"]
-        self._measurement = config["currency"]
-        self._categories = config["categories"]
-        self._accounts = config["accounts"]
+        self._attr_unique_id = config[CONF_BUDGET_KEY]
+        self._name = config[CONF_BUDGET_NAME_KEY]
+        self._measurement = config[CONF_CURRENCY_KEY]
+        self._categories = config[CONF_CATEGORIES_KEY]
+        self._accounts = config[CONF_ACCOUNTS_KEY]
 
     async def async_update(self):
         """Update the sensor."""

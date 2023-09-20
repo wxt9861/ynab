@@ -1,0 +1,41 @@
+{
+  "config": {
+    "error": {
+      "auth": "The API key is not valid"
+    },
+    "abort": {
+      "already_configured": "Budget is already configured"
+    },
+    "step": {
+      "user": {
+          "title": "API key",
+          "description": "Instructions for getting your API are available at https://api.ynab.com/",
+          "data": {
+              "api_key": "API key"
+
+          }
+      },
+      "budgets": {
+        "title": "Budget",
+        "description": "Select the budget to sync",
+        "data": {
+          "budget_name": "Budget name"
+        }
+      },
+      "categories": {
+        "title": "Categories",
+        "description": "Add any categories you want to sync",
+        "data": {
+          "categories": "Categories to sync"
+        }
+      },
+      "accounts": {
+        "title": "Accounts",
+        "description": "Add any accounts you want to sync",
+        "data": {
+          "accounts": "Accounts to sync"
+        }
+      }
+    }
+  }
+}

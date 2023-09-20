@@ -15,14 +15,14 @@ from ynab_sdk import YNAB
 
 from .const import (
     CONF_NAME,
+    CONF_BUDGET_KEY,
+    CONF_CATEGORIES_KEY,
+    CONF_ACCOUNTS_KEY,
+
     DEFAULT_API_ENDPOINT,
-    DEFAULT_BUDGET,
-    DEFAULT_CURRENCY,
-    DEFAULT_NAME,
     DOMAIN,
     DOMAIN_DATA,
     ISSUE_URL,
-    PLATFORMS,
     REQUIRED_FILES,
     STARTUP,
     VERSION,
@@ -32,25 +32,8 @@ MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=300)
 
 _LOGGER = logging.getLogger(__name__)
 
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_API_KEY): cv.string,
-                vol.Optional(CONF_NAME, default=DEFAULT_NAME): cv.string,
-                vol.Optional("budget", default=DEFAULT_BUDGET): cv.string,
-                vol.Optional("currency", default=DEFAULT_CURRENCY): cv.string,
-                vol.Optional("categories", default=None): vol.All(cv.ensure_list),
-                vol.Optional("accounts", default=None): vol.All(cv.ensure_list),
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
-)
-
-
-async def async_setup(hass, config):
-    """Set up this integration using yaml."""
+async def async_setup_entry(hass, entry):
+    """Set up this integration using config flow."""
     # startup message
     startup = STARTUP.format(name=DOMAIN, version=VERSION, issueurl=ISSUE_URL)
     _LOGGER.info(startup)
@@ -68,29 +51,22 @@ async def async_setup(hass, config):
     hass.data[DOMAIN_DATA] = {}
 
     # get global config
-    budget = config[DOMAIN].get("budget")
+    budget = entry.data[CONF_BUDGET_KEY]
     _LOGGER.debug("YAML configured budget - %s", budget)
 
-    if config[DOMAIN].get("categories") is not None:
-        categories = config[DOMAIN].get("categories")
+    if CONF_CATEGORIES_KEY in entry.data:
+        categories = entry.data[CONF_CATEGORIES_KEY]
         _LOGGER.debug("Monitoring categories - %s", categories)
 
-    if config[DOMAIN].get("accounts") is not None:
-        accounts = config[DOMAIN].get("accounts")
+    if CONF_ACCOUNTS_KEY in entry.data:
+        accounts = entry.data[CONF_ACCOUNTS_KEY]
         _LOGGER.debug("Monitoring accounts - %s", accounts)
 
-    hass.data[DOMAIN_DATA]["client"] = YnabData(hass, config)
+    hass.data[DOMAIN_DATA]["client"] = YnabData(hass, entry)
 
-    # load platforms
-    for platform in PLATFORMS:
-        # get platform specific configuration
-        platform_config = config[DOMAIN]
-
-        hass.async_create_task(
-            discovery.async_load_platform(
-                hass, platform, DOMAIN, platform_config, config
-            )
-        )
+    hass.async_create_task(
+        hass.config_entries.async_forward_entry_setup(entry, "sensor")
+    )
 
     return True
 
@@ -98,13 +74,13 @@ async def async_setup(hass, config):
 class YnabData:
     """This class handles communication and data for YNAB integration."""
 
-    def __init__(self, hass, config):
+    def __init__(self, hass, entry):
         """Initialize the class."""
         self.hass = hass
-        self.api_key = config[DOMAIN].get(CONF_API_KEY)
-        self.budget = config[DOMAIN].get("budget")
-        self.categories = config[DOMAIN].get("categories")
-        self.accounts = config[DOMAIN].get("accounts")
+        self.api_key = entry.data[CONF_API_KEY]
+        self.budget = entry.data[CONF_BUDGET_KEY]
+        self.categories = entry.data[CONF_CATEGORIES_KEY]
+        self.accounts = entry.data[CONF_ACCOUNTS_KEY]
 
         self.ynab = None
         self.all_budgets = None
