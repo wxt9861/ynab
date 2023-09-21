@@ -89,7 +89,7 @@ class YnabConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = {
             vol.Optional(CONF_CATEGORIES_KEY): selector({
                 "select": {
-                    "options": [{"label": name, "value": category.id} for name, category in categories_by_name.items()],
+                    "options": [{"label": name, "value": category.name} for name, category in categories_by_name.items()],
                     "multiple": True
                 }
             })
@@ -126,7 +126,7 @@ class YnabConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = {
             vol.Optional(CONF_ACCOUNTS_KEY): selector({
                 "select": {
-                    "options": [{"label": account.name, "value": account.id} for account in accounts_response.data.accounts],
+                    "options": [{"label": account.name, "value": account.name} for account in accounts_response.data.accounts],
                     "multiple": True
                 }
             })
