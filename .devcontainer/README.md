@@ -28,12 +28,6 @@ _It will now build the devcontainer._
 
 The container have some "tasks" to help you testing your changes.
 
-## Configuration
-
-Make a copy of `.devcontainer\sample_configuration.yaml` and place it here `.devcontainer\configuration.yaml`
-
-Add your github token to the new file.
-
 ## Custom Tasks in this repository
 
 _Start "tasks" by opening the the command pallet (ctrl+shift+p) and select `Tasks: Run Task`_

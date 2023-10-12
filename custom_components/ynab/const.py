@@ -2,7 +2,6 @@
 DOMAIN = "ynab"
 DOMAIN_DATA = f"{DOMAIN}_data"
 
-PLATFORMS = ["sensor"]
 REQUIRED_FILES = ["const.py", "manifest.json", "sensor.py"]
 VERSION = "0.3.0"
 ISSUE_URL = "https://github.com/wxt9861/ynab/issues"
@@ -32,3 +31,9 @@ ICON = "mdi:finance"
 CONF_NAME = "name"
 CONF_ENABLED = "enabled"
 CONF_SENSOR = "sensor"
+
+CONF_BUDGET_KEY = "budget"
+CONF_BUDGET_NAME_KEY = "budget_name"
+CONF_CATEGORIES_KEY = "categories"
+CONF_ACCOUNTS_KEY = "accounts"
+CONF_CURRENCY_KEY = "currency"
