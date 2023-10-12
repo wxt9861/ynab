@@ -4,7 +4,7 @@ DOMAIN_DATA = f"{DOMAIN}_data"
 
 PLATFORMS = ["sensor"]
 REQUIRED_FILES = ["const.py", "manifest.json", "sensor.py"]
-VERSION = "0.2.0"
+VERSION = "0.3.0"
 ISSUE_URL = "https://github.com/wxt9861/ynab/issues"
 
 STARTUP = """
@@ -25,6 +25,7 @@ ACCOUNT_ERROR = """Unable to create attribute for account \
 DEFAULT_NAME = "ynab"
 DEFAULT_BUDGET = "last-used"
 DEFAULT_CURRENCY = "$"
+DEFAULT_API_ENDPOINT = "https://api.ynab.com/v1"
 
 ICON = "mdi:finance"
 
